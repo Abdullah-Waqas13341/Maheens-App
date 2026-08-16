@@ -1,8 +1,13 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Is Abdullah your coolest cousin?",
-  description: "There is only one correct answer. The other button knows it.",
+  title: "do i really care?",
+  description: "be honest. one of these buttons refuses to let you lie. 💅",
+  openGraph: {
+    title: "do i really care?",
+    description: "be honest. one of these buttons refuses to let you lie. 💅",
+    type: "website",
+  },
 };
 
 export const viewport = {

@@ -188,13 +188,44 @@ body {
   letter-spacing: 0.5px;
 }
 
-.counter {
-  font-size: 14px;
-  font-weight: 900;
-  background: rgba(0, 0, 0, 0.45);
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.25);
+/* ---------- share ---------- */
+.share {
+  background: linear-gradient(135deg, #ff2e88, #b8005c);
+  box-shadow: 0 8px 0 #7d003e, 0 16px 30px rgba(0, 0, 0, 0.4);
+  padding: 14px 30px;
+  font-size: 15px;
+}
+
+.share:hover {
+  transform: translateY(-3px) scale(1.04);
+}
+
+.share:active {
+  transform: translateY(3px);
+  box-shadow: 0 4px 0 #7d003e;
+}
+
+/* the pre-win share sits quieter so it doesn't compete with the joke */
+.share.subtle {
+  background: rgba(0, 0, 0, 0.42);
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  box-shadow: none;
+  font-size: 13px;
+  padding: 11px 22px;
+  opacity: 0.9;
+}
+
+.share.subtle:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+  box-shadow: none;
+}
+
+.win-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 /* ---------- win screen ---------- */
@@ -321,7 +352,16 @@ body {
 
   .certificate p { font-size: 14px; }
   .certificate .sig { font-size: 12px; }
-  .again { width: 100%; }
+
+  /* full-width action buttons are much easier to hit with a thumb */
+  .win-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .again,
+  .win-actions .share { width: 100%; }
 }
 
 /* Very small phones — stack the buttons so neither gets squeezed */

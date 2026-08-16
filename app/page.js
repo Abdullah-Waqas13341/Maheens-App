@@ -3,21 +3,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 const TAUNTS = [
-  "Go on. Click one. No pressure. 😊",
-  "Hey! Where do you think you're going? 🏃",
-  "The No button has commitment issues.",
-  "Nope. Try again, slowpoke. 🐌",
-  "You cannot catch what does not want to be caught. 🧘",
-  "Bro is really out here fighting a button. 💀",
-  "The button has filed a restraining order.",
-  "Even your WiFi is faster than that click.",
-  "No has left the chat. Twice.",
-  "Plot twist: the answer was always Yes. 💚",
-  "Your mouse is tired. Abdullah is not.",
-  "10 attempts?! This is a cry for help.",
-  "Fine. Keep trying. I've got all day. ⏳",
-  "The No button is now legally a bird. 🐦",
-  "Just click Yes. Your wrist will thank you.",
+  "Be honest for once in your life. 💅",
+  "Oh? Going for the other one? Bold. 👀",
+  "It's running. Like he did. 🏃‍♀️",
+  "Babe. The button knows. Just click yes.",
+  "You can lie to the group chat, not to me. 💋",
+  "This is the most effort you've given all year.",
+  "Girl. Put the phone down and be honest.",
+  "The delusion is honestly kind of impressive. ✨",
+  "Not you fighting a button at 2am. 💀",
+  "We both know how this ends. 🙃",
+  "Your thumb is tired. The truth isn't. 😌",
+  "Okay now you're just being dramatic.",
+  "It will NEVER let you press it. Ever. 🔒",
+  "The button has better boundaries than you. 🧘‍♀️",
+  "Fine. Stay in denial. It's cute. 💅",
 ];
 
 // The No button shrinks a little as you chase it, but stays comfortably
@@ -32,9 +32,17 @@ export default function Home() {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [won, setWon] = useState(false);
   const [confetti, setConfetti] = useState([]);
+  const [shareMsg, setShareMsg] = useState("");
 
   const noRef = useRef(null);
   const yesRef = useRef(null);
+
+  /** Tiny buzz on dodge where supported (Android); iOS Safari ignores it. */
+  const buzz = (pattern) => {
+    try {
+      navigator.vibrate?.(pattern);
+    } catch {}
+  };
 
   /** Teleport the No button to a random spot far from wherever the cursor is. */
   const flee = useCallback(
@@ -86,6 +94,7 @@ export default function Home() {
       // On the first dodge it pops out of the flex row into fixed positioning.
       if (!loose) setLoose(true);
       setPos({ x: best.x, y: best.y });
+      buzz(18);
 
       setDodges((n) => {
         const next = n + 1;
@@ -142,7 +151,8 @@ export default function Home() {
     };
   }, [loose, won]);
 
-  // Touch devices have no hover, so dodge on tap/drag instead.
+  // Touch devices have no hover, so dodge on tap/drag instead. touchmove
+  // means it flees as the thumb approaches, not only once you land on it.
   const onNoTouch = (e) => {
     e.preventDefault();
     const t = e.touches?.[0] ?? e.changedTouches?.[0];
@@ -151,6 +161,7 @@ export default function Home() {
 
   const onYes = () => {
     setWon(true);
+    buzz([40, 60, 40, 60, 120]);
     const pieces = Array.from({ length: 90 }, (_, i) => ({
       id: i,
       left: Math.random() * 100,
@@ -164,12 +175,31 @@ export default function Home() {
     setConfetti(pieces);
   };
 
+  /** Native share sheet on mobile, clipboard copy everywhere else. */
+  const onShare = async () => {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    const text = "be honest. answer this. 💅";
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "do i really care?", text, url });
+        return;
+      }
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      setShareMsg("link copied — go ruin someone's day 💅");
+      setTimeout(() => setShareMsg(""), 2600);
+    } catch {
+      // User dismissed the share sheet, or clipboard was blocked.
+    }
+  };
+
   const reset = () => {
     setWon(false);
     setConfetti([]);
     setDodges(0);
     setLoose(false);
     setTaunt(TAUNTS[0]);
+    setShareMsg("");
   };
 
   const scale = Math.max(MIN_SCALE, 1 - dodges * SHRINK_PER_DODGE);
@@ -193,34 +223,34 @@ export default function Home() {
           />
         ))}
         <main className="stage win">
-          <div className="emoji">🎉👑🎉</div>
+          <div className="emoji">💅✨</div>
           <h1 className="title">
-            CORRECT ANSWER!<br />
-            <span className="name">Abdullah</span> wins again.
+            knew it.<br />
+            <span className="name">you care.</span>
           </h1>
           <div className="certificate">
-            <h2>🏆 OFFICIAL CERTIFICATE 🏆</h2>
+            <h2>💌 RECEIPTS 💌</h2>
             <p>
-              This certifies that <strong>Abdullah</strong> is, beyond any
-              reasonable doubt, the <strong>coolest cousin</strong> in the entire
-              extended family — including the ones we only see at weddings.
+              After all that running, you pressed it. You <strong>care</strong>.
+              Loudly. Publicly. In front of everyone.
             </p>
             <p>
-              You resisted for <strong>{dodges}</strong>{" "}
-              {dodges === 1 ? "dodge" : "dodges"} before accepting the truth.
-              {dodges === 0
-                ? " Instant recognition. Respect. 🫡"
-                : dodges > 10
-                ? " That was genuinely embarrassing to watch. 💀"
-                : " Took you long enough. 😌"}
+              The &ldquo;i&rsquo;m so over it&rdquo; era is officially cancelled.
+              We all saw. There are witnesses. 👀
             </p>
             <div className="sig">
-              Notarized by the Cousin Council · No refunds · No takebacks
+              screenshot this · send it to her · deny everything
             </div>
           </div>
-          <button className="btn again" onClick={reset}>
-            🔁 Ask me again (I'll still say yes)
-          </button>
+          <div className="win-actions">
+            <button className="btn share" onClick={onShare}>
+              💌 send this to someone
+            </button>
+            <button className="btn again" onClick={reset}>
+              🔁 let me try again
+            </button>
+          </div>
+          {shareMsg && <div className="hint">{shareMsg}</div>}
         </main>
       </>
     );
@@ -232,13 +262,13 @@ export default function Home() {
       <main className="stage">
         <div className="emoji">🤨</div>
         <h1 className="title">
-          Is <span className="name">Abdullah</span> your coolest cousin?
+          do i <span className="name">really</span> care?
         </h1>
         <div className="taunt">{taunt}</div>
 
         <div className="buttons">
           <button ref={yesRef} className="btn yes" onClick={onYes}>
-            YES, obviously 💚
+            no, obviously 💅
           </button>
 
           <button
@@ -246,6 +276,7 @@ export default function Home() {
             className={`btn no${loose ? " loose" : ""}`}
             onClick={(e) => flee(e.clientX, e.clientY)}
             onTouchStart={onNoTouch}
+            onTouchMove={onNoTouch}
             style={
               loose
                 ? {
@@ -255,16 +286,14 @@ export default function Home() {
                 : undefined
             }
           >
-            no 🙄
+            yes 🙄
           </button>
         </div>
 
-        {dodges > 0 && (
-          <div className="counter">
-            Failed attempts: {dodges} {dodges > 6 ? "😭" : "😏"}
-          </div>
-        )}
-        <div className="hint">psst — one of these buttons is a coward</div>
+        <button className="btn share subtle" onClick={onShare}>
+          💌 send to a friend
+        </button>
+        {shareMsg && <div className="hint">{shareMsg}</div>}
       </main>
     </>
   );
